@@ -246,28 +246,31 @@ top_spend.head(5)
 purchase_data.head()
 
 
-# In[14]:
+# In[12]:
 
 
 ### Most Popular Items ###
 
+# Find the unique values for item id, name and price
 popular = purchase_data.drop_duplicates(['Item_ID','Item_Name'])
 popular = popular[['Item_ID','Item_Name','Price']]
 popular.rename(columns = {'Price':'Item Price'}, inplace = True)
 popular
 
+# Find the number of each item that was purcahsed
 item_count = purchase_data.Item_ID.value_counts()
 item_count = pd.DataFrame(item_count)
 item_count = item_count.reset_index()
 item_count.rename(columns = {'index':'Item_ID', 'Item_ID':'Purchase Count'}, inplace = True)
 item_count
 
+# Merge the two dataframes together, matching on item id
 merge = pd.merge(popular, item_count, on="Item_ID")
 merge.rename(columns = {'Item_ID': 'Item ID', 'Item_Name':'Item Name'}, inplace = True)
 
 merge['Total Purchase Value'] = merge['Item Price'] * merge['Purchase Count']
 
-# Re-order columns formatting and sort
+# Re-order columns and formatting, set new index and sort columns
 merge = merge[['Item ID','Item Name','Purchase Count', 'Item Price', 'Total Purchase Value']]
 
 merge = merge.sort_values(by=['Purchase Count'], ascending=False)
@@ -283,13 +286,15 @@ for key, value in format_mapping.items():
 purch_merge.head()
 
 
-# In[15]:
+# In[13]:
 
+
+### Most Profitable Items ###
 
 # Sort by total purchase value in descending order
-
 merge = merge.sort_values(by=['Total Purchase Value'], ascending=False)
 
+# Set new index and formatting
 total_merge = merge.set_index(['Item ID','Item Name'])
 
 format_mapping = {'Purchase Count': '{:,.0f}', 'Item Price': '${:,.2f}', 
@@ -301,20 +306,12 @@ for key, value in format_mapping.items():
 total_merge.head()
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
+# Include a written description of three observable trends based on the data.
+# 
+# 1. 3/5 of the most "profitable" items are also the most popular items. Although, profitability is not necessarily linked to the higher prices items as they may be more expensive to ship, produce, store, etc.
+# 
+# 2. If the company were looking for an age group to market to, it appears the male, 20-24 age group would be the best fit as they spend more money, purchase the most items and make up the largest percentage of players.
+# 
+# 3. Average Purchase Price and Average Purchase per Person seems to be consistent across age demographics.
+# 
+# 4. Further analysis could be done to reduce the number of items sold and maintain profitability. 183 items is a large inventory and many of these items only sold one item. Analysis could show if there is a correlation between repeat customers and larger overall purchases for the more rarely purchased items.
